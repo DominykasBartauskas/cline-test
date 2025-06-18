@@ -55,6 +55,7 @@ def setup_logging() -> None:
     
     # Set up logfire
     logfire.configure(
+        token=settings.LOGFIRE_TOKEN,
         handlers=[
             LogfireHandler(
                 level=logging.INFO if settings.ENVIRONMENT == "production" else logging.DEBUG,

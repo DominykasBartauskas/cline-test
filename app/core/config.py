@@ -42,23 +42,38 @@ class Settings(BaseSettings):
     DATABASE_URI: Optional[PostgresDsn] = None
     
     @field_validator("DATABASE_URI", mode="before")
-    def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+    def assemble_db_connection(cls, v: Optional[str], info: Any) -> Any:
         """Assemble database connection string."""
         if isinstance(v, str):
             return v
         
+        # Get values from the model
+        values = info.data
+        
+        # Convert port to integer
+        port = values.get("POSTGRES_PORT")
+        if port is not None:
+            port = int(port)
+        
         return PostgresDsn.build(
             scheme="postgresql+asyncpg",
-            username=values.data.get("POSTGRES_USER"),
-            password=values.data.get("POSTGRES_PASSWORD"),
-            host=values.data.get("POSTGRES_SERVER"),
-            port=values.data.get("POSTGRES_PORT"),
-            path=f"/{values.data.get('POSTGRES_DB') or ''}",
+            username=values.get("POSTGRES_USER"),
+            password=values.get("POSTGRES_PASSWORD"),
+            host=values.get("POSTGRES_SERVER"),
+            port=port,
+            path=f"/{values.get('POSTGRES_DB') or ''}",
         )
     
     # TMDB API settings
     TMDB_API_KEY: str = ""
     TMDB_API_BASE_URL: str = "https://api.themoviedb.org/3"
+    
+    # Cache settings
+    CACHE_ENABLED: bool = True
+    CACHE_EXPIRE_MINUTES: int = 60  # 1 hour
+    
+    # Logging settings
+    LOGFIRE_TOKEN: str
     
     model_config = SettingsConfigDict(
         env_file=".env",
