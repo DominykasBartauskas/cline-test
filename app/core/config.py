@@ -61,12 +61,13 @@ class Settings(BaseSettings):
             password=values.get("POSTGRES_PASSWORD"),
             host=values.get("POSTGRES_SERVER"),
             port=port,
-            path=f"/{values.get('POSTGRES_DB') or ''}",
+            path=f"{values.get('POSTGRES_DB') or ''}",
         )
     
     # TMDB API settings
     TMDB_API_KEY: str = ""
     TMDB_API_BASE_URL: str = "https://api.themoviedb.org/3"
+    TMDB_IMAGE_BASE_URL: str = "https://image.tmdb.org/t/p"
     
     # Cache settings
     CACHE_ENABLED: bool = True

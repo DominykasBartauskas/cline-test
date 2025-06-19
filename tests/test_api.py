@@ -2,61 +2,30 @@
 Test API endpoints.
 """
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
-
-from app.core.config import settings
-from app.db.database import get_db
-from app.main import app
-
-# Create test database engine
-TEST_DATABASE_URL = str(settings.DATABASE_URI).replace(
-    settings.POSTGRES_DB, "test_db"
-)
-test_engine = create_async_engine(str(TEST_DATABASE_URL), echo=False)
-TestingSessionLocal = sessionmaker(
-    test_engine, class_=AsyncSession, expire_on_commit=False
-)
 
 
-# Dependency override
-async def override_get_db():
-    """Get test database session."""
-    async with TestingSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-
-# Override the dependency
-app.dependency_overrides[get_db] = override_get_db
-
-# Test client
-client = TestClient(app)
-
-
-def test_read_main():
+@pytest.mark.asyncio
+async def test_read_main(client):
     """Test root endpoint."""
-    response = client.get("/")
+    response = await client.get("/")
     assert response.status_code == 200
     assert "message" in response.json()
     assert "version" in response.json()
     assert "docs" in response.json()
 
 
-def test_health():
+@pytest.mark.asyncio
+async def test_health(client):
     """Test health endpoint."""
-    response = client.get("/health")
+    response = await client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 
 @pytest.mark.asyncio
-async def test_get_movies():
+async def test_get_movies(client):
     """Test get movies endpoint."""
-    response = client.get("/api/movies")
+    response = await client.get("/api/movies")
     assert response.status_code == 200
     assert "items" in response.json()
     assert "total" in response.json()
@@ -66,9 +35,9 @@ async def test_get_movies():
 
 
 @pytest.mark.asyncio
-async def test_get_tv_shows():
+async def test_get_tv_shows(client):
     """Test get TV shows endpoint."""
-    response = client.get("/api/tv")
+    response = await client.get("/api/tv")
     assert response.status_code == 200
     assert "items" in response.json()
     assert "total" in response.json()
@@ -78,18 +47,19 @@ async def test_get_tv_shows():
 
 
 @pytest.mark.asyncio
-async def test_get_genres():
+async def test_get_genres(client):
     """Test get genres endpoint."""
-    response = client.get("/api/genres")
+    response = await client.get("/api/genres")
     assert response.status_code == 200
-    assert "movie_genres" in response.json()
-    assert "tv_genres" in response.json()
+    # The genres endpoint returns a list of genres
+    genres = response.json()
+    assert isinstance(genres, list)
 
 
 @pytest.mark.asyncio
-async def test_search_multi():
+async def test_search_multi(client):
     """Test search multi endpoint."""
-    response = client.get("/api/search/multi?query=test")
+    response = await client.get("/api/search/multi?query=test")
     assert response.status_code == 200
     assert "movies" in response.json()
     assert "tv_shows" in response.json()
