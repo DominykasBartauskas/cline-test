@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -33,7 +33,7 @@ class TMDBService:
         cache_key = f"{endpoint}:{str(params)}"
         if settings.CACHE_ENABLED and cache_key in self.cache:
             cached_data, expire_time = self.cache[cache_key]
-            if datetime.utcnow() < expire_time:
+            if datetime.now(UTC) < expire_time:
                 logfire.debug("Cache hit", endpoint=endpoint)
                 return cached_data
         
@@ -47,7 +47,7 @@ class TMDBService:
                 
                 # Cache response if enabled
                 if settings.CACHE_ENABLED:
-                    expire_time = datetime.utcnow() + timedelta(minutes=self.cache_expire_minutes)
+                    expire_time = datetime.now(UTC) + timedelta(minutes=self.cache_expire_minutes)
                     self.cache[cache_key] = (data, expire_time)
                 
                 return data

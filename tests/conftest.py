@@ -17,8 +17,8 @@ from app.main import app
 from app.models.domain.base import Base
 
 # Create test database engine
-TEST_DATABASE_URL = settings.DATABASE_URI.replace(
-    f"/{settings.POSTGRES_DB}", "/test_db"
+TEST_DATABASE_URL = str(settings.DATABASE_URI).replace(
+    settings.POSTGRES_DB, "test_db"
 )
 test_engine = create_async_engine(str(TEST_DATABASE_URL), echo=False)
 TestingSessionLocal = sessionmaker(

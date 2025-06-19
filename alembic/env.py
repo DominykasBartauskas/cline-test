@@ -29,9 +29,14 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
 
-# Set the database URL in the Alembic config
-config.set_main_option("sqlalchemy.url", str(settings.DATABASE_URI))
-
+# Check if custom database URL is passed via command line
+database_url = context.get_x_argument(as_dictionary=True).get('database_url')
+if database_url:
+    # Use the custom database URL
+    config.set_main_option("sqlalchemy.url", database_url)
+else:
+    # Set the database URL in the Alembic config using settings
+    config.set_main_option("sqlalchemy.url", str(settings.DATABASE_URI))
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
