@@ -1,3 +1,58 @@
+[project]
+name = "tmdb-api-backend"
+version = "0.1.0"
+description = "A FastAPI backend that ingests information from the TMDB API (movies, TV shows, anime) and stores it in a PostgreSQL database."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    {name = "Dominykas Bartauskas", email = "dominykas@pirmaskodas.lt"}
+]
+
+dependencies = [
+    # FastAPI and related
+    "fastapi>=0.104.0",
+    "uvicorn>=0.23.2",
+    "pydantic[email]>=2.4.2",
+    "pydantic-settings>=2.0.3",
+    "python-multipart>=0.0.6",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    
+    # Database
+    "sqlalchemy>=2.0.22",
+    "asyncpg>=0.28.0",
+    "alembic>=1.12.0",
+    
+    # HTTP client
+    "httpx>=0.25.0",
+    
+    # Logging
+    "logfire>=0.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.2",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    
+    # Development tools
+    "black>=23.9.1",
+    "isort>=5.12.0",
+    "pyright>=1.1.331",
+    "pre-commit>=3.5.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["alembic*", "tests*", "venv*"]
+
 [tool.black]
 line-length = 88
 target-version = ['py310']
